@@ -1,3 +1,292 @@
+# API REST per Sensors IoT - Spring Boot 4.0.0
+
+[English version below](#iot-sensors-rest-api---spring-boot-400)
+
+Una API REST funcional amb Spring Boot per gestionar lectures de sensors IoT (temperatura, humitat i pressió).
+
+## Funcionalitats
+
+- ✅ Spring Boot 4.0.0
+- ✅ API REST amb operacions CRUD completes
+- ✅ Dades de sensors IoT (temperatura, humitat, pressió)
+- ✅ Suport per dades parcials dels sensors (camps opcionals)
+- ✅ Simuladors de sensors en Java i C
+- ✅ Documentació Swagger/OpenAPI
+- ✅ Dos entorns: Desenvolupament (H2) i Producció (PostgreSQL)
+- ✅ JPA/Hibernate per persistència
+- ✅ Validació d'entrada
+- ✅ Scripts SQL per a la creació de la base de dades
+
+## Tecnologies
+
+- **Java 17+**
+- **Spring Boot 4.0.0**
+- **Spring Data JPA**
+- **H2 Database** (desenvolupament)
+- **PostgreSQL** (producció)
+- **SpringDoc OpenAPI 3** (Swagger UI)
+- **Maven**
+
+## Tècnica d'accés a la base de dades
+
+Aquest projecte utilitza **JPA (Java Persistence API)** amb **Spring Data JPA** com a tècnica d'accés a la base de dades.
+
+### Components clau:
+
+1. **Entitats JPA**: La classe `Sensor` està anotada amb `@Entity` i usa anotacions JPA per al mapeig ORM
+   - `@Entity` i `@Table` per mapar a taules de la base de dades
+   - `@Id` i `@GeneratedValue` per a la gestió de claus primàries
+   - `@Column` per al mapeig de camps a columnes
+   - `@PrePersist` i `@PreUpdate` per callbacks del cicle de vida
+
+2. **Repositoris Spring Data JPA**: La interfície `SensorRepository` estèn `JpaRepository<Sensor, Long>`
+   - Proporciona operacions CRUD automàtiques sense codi repetitiu
+   - Mètodes de consulta personalitzats per convenció de nom (per exemple, `findByLocation`, `findByName`)
+   - Implementació automàtica en temps d'execució per Spring Data
+
+3. **Hibernate com a proveïdor JPA**: Hibernate s'utilitza com a implementació JPA
+   - Generació automàtica d'esquema (DDL) en desenvolupament
+   - Gestió de transaccions
+   - Pool de connexions via HikariCP
+
+### Avantatges d'aquest enfocament:
+
+- **Orientat a objectes**: Treballar amb objectes Java en lloc d'escriure SQL manual
+- **Independència de base de dades**: El mateix codi funciona amb H2 (dev) i PostgreSQL (prod)
+- **Menys codi repetitiu**: No cal implementar DAOs
+- **Tipatge**: Comprovacions a compilació per consultes
+- **CRUD automàtic**: Operacions estàndard disponibles per defecte
+- **Consultes personalitzades**: Fàcil d'afegir mètodes de consulta amb noms o JPQL
+
+## Requisits previs
+
+- Java 17 o superior
+- Maven 3.6+
+- PostgreSQL 12+ (per a l'entorn de producció)
+
+## Inici ràpid
+
+### 1. Clonar el repositori
+
+```bash
+git clone https://github.com/xsastre/Spring-boot-apirest-jpa.git
+cd Spring-boot-apirest-jpa
+```
+
+### 2. Compilar el projecte
+
+```bash
+mvn clean install
+```
+
+### 3. Executar en entorn de desenvolupament (H2)
+
+```bash
+mvn spring-boot:run
+```
+
+O amb perfil explícit:
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+L'aplicació s'iniciarà a `http://localhost:8080`
+
+### 4. Executar en entorn de producció (PostgreSQL)
+
+Primer, assegurar que PostgreSQL està en marxa i crear la base de dades:
+
+```bash
+psql -U postgres
+CREATE DATABASE iot_sensors_db;
+\q
+```
+
+Executar l'script d'esquema:
+
+```bash
+psql -U postgres -d iot_sensors_db -f src/main/resources/schema-postgresql.sql
+```
+
+Actualitzar credencials a `src/main/resources/application-prod.properties` si cal.
+
+Executar l'aplicació:
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=prod
+```
+
+## Documentació de l'API
+
+### Swagger UI
+
+Un cop l'aplicació està en marxa, accedir a Swagger UI a:
+
+```
+http://localhost:8080/swagger-ui.html
+```
+
+### Endpoints de l'API
+
+| Mètode | Endpoint                      | Descripció                     |
+|--------|-------------------------------|---------------------------------|
+| POST   | `/api/sensors`                | Crear una nova lectura de sensor|
+| GET    | `/api/sensors`                | Obtenir totes les lectures      |
+| GET    | `/api/sensors/{id}`           | Obtenir sensor per ID           |
+| GET    | `/api/sensors/location/{loc}` | Obtenir sensors per ubicació    |
+| GET    | `/api/sensors/name/{name}`    | Obtenir sensors per nom         |
+| PUT    | `/api/sensors/{id}`           | Actualitzar una lectura         |
+| DELETE | `/api/sensors/{id}`           | Eliminar una lectura            |
+
+### Exemple de petició
+
+**Crear una lectura de sensor amb tots els camps:**
+
+```bash
+curl -X POST http://localhost:8080/api/sensors \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sensor-006",
+    "location": "Laboratori",
+    "temperature": 21.5,
+    "humidity": 60.0,
+    "pressure": 1013.5
+  }'
+```
+
+**Crear una lectura de sensor amb dades parcials (camps opcionals):**
+
+```bash
+curl -X POST http://localhost:8080/api/sensors \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sensor-007",
+    "location": "Laboratori",
+    "temperature": 22.3
+  }'
+```
+
+**Obtenir tots els sensors:**
+
+```bash
+curl http://localhost:8080/api/sensors
+```
+
+## Esquema de la base de dades
+
+### Taula sensors
+
+```sql
+CREATE TABLE sensors (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    temperature DOUBLE PRECISION NOT NULL,
+    humidity DOUBLE PRECISION NOT NULL,
+    pressure DOUBLE PRECISION NOT NULL,
+    measurement_time TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP
+);
+```
+
+## Configuració d'entorns
+
+### Desenvolupament (H2)
+
+- Base de dades: H2 en memòria
+- Consola: http://localhost:8080/h2-console
+- JDBC URL: `jdbc:h2:mem:iot_sensors_db`
+- Usuari: `sa`
+- Contrasenya: (buida)
+- Esquema auto-creat: Sí
+- Dades mostral: Sí
+
+### Producció (PostgreSQL)
+
+- Base de dades: PostgreSQL
+- JDBC URL: `jdbc:postgresql://localhost:5432/iot_sensors_db`
+- Usuari: `postgres` (configurable)
+- Contrasenya: `postgres` (configurable)
+- Gestió d'esquema: Manual (amb scripts SQL)
+
+## Estructura del projecte
+
+```
+src/
+├── main/
+│   ├── java/com/iot/sensors/
+│   │   ├── IotSensorsApplication.java    # Aplicació principal
+│   │   ├── config/
+│   │   │   └── OpenApiConfig.java        # Configuració Swagger
+│   │   ├── controller/
+│   │   │   └── SensorController.java     # Endpoints REST
+│   │   ├── dto/
+│   │   │   ├── SensorRequest.java        # DTO de petició
+│   │   │   └── SensorResponse.java       # DTO de resposta
+│   │   ├── model/
+│   │   │   └── Sensor.java               # Entitat JPA
+│   │   ├── repository/
+│   │   │   └── SensorRepository.java     # Accés a dades
+│   │   └── service/
+│   │       └── SensorService.java        # Lògica de negoci
+│   └── resources/
+│       ├── application.properties         # Config principal
+│       ├── application-dev.properties     # Config dev
+│       ├── application-prod.properties    # Config prod
+│       ├── schema.sql                     # Esquema genèric
+│       ├── schema-postgresql.sql          # Esquema PostgreSQL
+│       └── data-dev.sql                   # Dades mostral dev
+└── test/
+    └── java/com/iot/sensors/              # Tests
+```
+
+## Simuladors de sensors
+
+Aquest projecte inclou simuladors de sensors en Java i C per provar l'API simulant el comportament real d'un sensor:
+
+- **Ubicació**: `simulators/`
+- **Característiques**:
+    - Envia dades cada ~30 segons (amb variació aleatòria de ±10 segons)
+    - Genera lectures fictícies de temperatura, humitat i pressió
+    - Envia aleatòriament 1, 2 o 3 paràmetres
+    - Simula pèrdua de paquets (10% de probabilitat d'ometre una transmissió)
+
+Vegeu `simulators/README.md` per instruccions detallades de compilació i execució.
+
+## Proves
+
+Executar proves amb:
+
+```bash
+mvn test
+```
+
+## Compilar per producció
+
+Crear el JAR:
+
+```bash
+mvn clean package
+```
+
+Executar el JAR:
+
+```bash
+java -jar target/spring-boot-iot-api-1.0.0.jar --spring.profiles.active=prod
+```
+
+## Llicència
+
+Apache 2.0
+
+## Autor
+
+Xavier Sastre
+
+____
+
 # IoT Sensors REST API - Spring Boot 4.0.0
 
 A functional Spring Boot REST API for managing IoT sensor readings (temperature, humidity, and pressure).
@@ -281,4 +570,4 @@ Apache 2.0
 
 ## Author
 
-IoT Sensors Team
+Xavier Sastre
