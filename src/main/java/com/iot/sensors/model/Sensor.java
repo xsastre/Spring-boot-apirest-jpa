@@ -21,16 +21,13 @@ public class Sensor {
     @Column(nullable = false)
     private String location;
 
-    @NotNull(message = "Temperature is required")
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Double temperature;
 
-    @NotNull(message = "Humidity is required")
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Double humidity;
 
-    @NotNull(message = "Pressure is required")
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Double pressure;
 
     @Column(name = "measurement_time", nullable = false)

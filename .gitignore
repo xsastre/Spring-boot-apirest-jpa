@@ -40,6 +40,9 @@ build/
 dist/
 out/
 
+# Compiled files
+*.class
+
 # Package files
 *.jar
 *.war
@@ -53,3 +56,6 @@ out/
 *.db
 *.mv.db
 *.trace.db
+
+# CodeQL
+_codeql_detected_source_root

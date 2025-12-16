@@ -11,13 +11,10 @@ public class SensorRequest {
     @NotBlank(message = "Location is required")
     private String location;
 
-    @NotNull(message = "Temperature is required")
     private Double temperature;
 
-    @NotNull(message = "Humidity is required")
     private Double humidity;
 
-    @NotNull(message = "Pressure is required")
     private Double pressure;
 
     public SensorRequest() {

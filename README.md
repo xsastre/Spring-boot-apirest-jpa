@@ -7,6 +7,8 @@ A functional Spring Boot REST API for managing IoT sensor readings (temperature,
 - ✅ Spring Boot 4.0.0
 - ✅ REST API with full CRUD operations
 - ✅ IoT Sensors data (temperature, humidity, pressure)
+- ✅ Support for partial sensor data (optional fields)
+- ✅ Sensor simulators in Java and C
 - ✅ Swagger/OpenAPI documentation
 - ✅ Two environments: Development (H2) and Production (PostgreSQL)
 - ✅ JPA/Hibernate for persistence
@@ -137,7 +139,7 @@ http://localhost:8080/swagger-ui.html
 
 ### Example Request
 
-**Create a sensor reading:**
+**Create a sensor reading with all fields:**
 
 ```bash
 curl -X POST http://localhost:8080/api/sensors \
@@ -148,6 +150,18 @@ curl -X POST http://localhost:8080/api/sensors \
     "temperature": 21.5,
     "humidity": 60.0,
     "pressure": 1013.5
+  }'
+```
+
+**Create a sensor reading with partial data (optional fields):**
+
+```bash
+curl -X POST http://localhost:8080/api/sensors \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sensor-007",
+    "location": "Laboratory",
+    "temperature": 22.3
   }'
 ```
 
@@ -225,6 +239,19 @@ src/
 └── test/
     └── java/com/iot/sensors/              # Test classes
 ```
+
+## Sensor Simulators
+
+This project includes sensor simulators in Java and C that can be used to test the API by simulating real IoT sensor behavior:
+
+- **Location**: `simulators/` directory
+- **Features**:
+  - Send data every ~30 seconds (with ±10 seconds random variation)
+  - Generate fictitious temperature, humidity, and pressure readings
+  - Randomly send 1, 2, or 3 parameters
+  - Simulate packet loss (10% chance of skipping transmission)
+
+See [simulators/README.md](simulators/README.md) for detailed instructions on how to compile and run the simulators.
 
 ## Testing
 
