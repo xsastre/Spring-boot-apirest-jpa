@@ -2,6 +2,7 @@ package com.iot.sensors.service;
 
 import com.iot.sensors.dto.SensorRequest;
 import com.iot.sensors.dto.SensorResponse;
+import com.iot.sensors.exception.SensorNotFoundException;
 import com.iot.sensors.model.Sensor;
 import com.iot.sensors.repository.SensorRepository;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class SensorService {
 
     public SensorResponse getSensorById(Long id) {
         Sensor sensor = sensorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Sensor not found with id: " + id));
+                .orElseThrow(() -> new SensorNotFoundException(id));
         return new SensorResponse(sensor);
     }
 
@@ -58,7 +59,7 @@ public class SensorService {
 
     public SensorResponse updateSensor(Long id, SensorRequest request) {
         Sensor sensor = sensorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Sensor not found with id: " + id));
+                .orElseThrow(() -> new SensorNotFoundException(id));
         
         sensor.setName(request.getName());
         sensor.setLocation(request.getLocation());
@@ -72,7 +73,7 @@ public class SensorService {
 
     public void deleteSensor(Long id) {
         if (!sensorRepository.existsById(id)) {
-            throw new RuntimeException("Sensor not found with id: " + id);
+            throw new SensorNotFoundException(id);
         }
         sensorRepository.deleteById(id);
     }
