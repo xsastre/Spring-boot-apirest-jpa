@@ -11,9 +11,20 @@ A complete and functional Spring Boot 4.0.0 REST API for managing IoT sensor rea
 
 ### ✅ REST API for IoT Sensors
 Implemented complete CRUD operations for sensor data:
-- **Temperature**: Numeric value for temperature readings
-- **Humidity**: Numeric value for humidity percentage
-- **Pressure**: Numeric value for atmospheric pressure
+- **Temperature**: Numeric value for temperature readings (optional)
+- **Humidity**: Numeric value for humidity percentage (optional)
+- **Pressure**: Numeric value for atmospheric pressure (optional)
+- Supports partial sensor data (any combination of 1, 2, or 3 fields)
+
+### ✅ Sensor Simulators
+Implemented sensor simulators to test the API:
+- **Java Simulator**: Standalone Java program that simulates IoT sensor behavior
+- **C Simulator**: C program using libcurl for HTTP requests
+- Both simulators feature:
+  - Random timing: ~30 seconds ± 10 seconds between transmissions
+  - Fictitious data generation: Temperature (15-30°C), Humidity (30-80%), Pressure (980-1040 hPa)
+  - Random field selection: Sends 1, 2, or 3 fields randomly
+  - Packet loss simulation: 10% chance of skipping transmission
 
 ### ✅ Swagger Documentation
 - Integrated SpringDoc OpenAPI 3 (version 2.7.0)
@@ -133,36 +144,46 @@ This project implements the **JPA standard** for database access, using **Spring
 ## Project Structure
 
 ```
-src/
-├── main/
-│   ├── java/com/iot/sensors/
-│   │   ├── IotSensorsApplication.java
-│   │   ├── config/
-│   │   │   └── OpenApiConfig.java
-│   │   ├── controller/
-│   │   │   └── SensorController.java
-│   │   ├── dto/
-│   │   │   ├── SensorRequest.java
-│   │   │   └── SensorResponse.java
-│   │   ├── exception/
-│   │   │   ├── GlobalExceptionHandler.java
-│   │   │   └── SensorNotFoundException.java
-│   │   ├── model/
-│   │   │   └── Sensor.java
-│   │   ├── repository/
-│   │   │   └── SensorRepository.java
-│   │   └── service/
-│   │       └── SensorService.java
-│   └── resources/
-│       ├── application.properties
-│       ├── application-dev.properties
-│       ├── application-prod.properties
-│       ├── schema.sql
-│       ├── schema-postgresql.sql
-│       └── data-dev.sql
-└── test/
-    └── java/com/iot/sensors/
-        └── IotSensorsApplicationTests.java
+.
+├── src/
+│   ├── main/
+│   │   ├── java/com/iot/sensors/
+│   │   │   ├── IotSensorsApplication.java
+│   │   │   ├── config/
+│   │   │   │   └── OpenApiConfig.java
+│   │   │   ├── controller/
+│   │   │   │   └── SensorController.java
+│   │   │   ├── dto/
+│   │   │   │   ├── SensorRequest.java
+│   │   │   │   └── SensorResponse.java
+│   │   │   ├── exception/
+│   │   │   │   ├── GlobalExceptionHandler.java
+│   │   │   │   └── SensorNotFoundException.java
+│   │   │   ├── model/
+│   │   │   │   └── Sensor.java
+│   │   │   ├── repository/
+│   │   │   │   └── SensorRepository.java
+│   │   │   └── service/
+│   │   │       └── SensorService.java
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── application-dev.properties
+│   │       ├── application-prod.properties
+│   │       ├── schema.sql
+│   │       ├── schema-postgresql.sql
+│   │       └── data-dev.sql
+│   └── test/
+│       └── java/com/iot/sensors/
+│           └── IotSensorsApplicationTests.java
+└── simulators/
+    ├── README.md
+    ├── java/
+    │   ├── SensorSimulator.java
+    │   └── README.md
+    └── c/
+        ├── sensor_simulator.c
+        ├── Makefile
+        └── README.md
 ```
 
 ## How to Run
@@ -185,7 +206,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=prod
 
 ## API Examples
 
-### Create Sensor Reading
+### Create Sensor Reading (All Fields)
 ```bash
 curl -X POST http://localhost:8080/api/sensors \
   -H "Content-Type: application/json" \
@@ -198,9 +219,34 @@ curl -X POST http://localhost:8080/api/sensors \
   }'
 ```
 
+### Create Sensor Reading (Partial Data)
+```bash
+curl -X POST http://localhost:8080/api/sensors \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sensor-002",
+    "location": "Laboratory",
+    "temperature": 22.3
+  }'
+```
+
 ### Get All Sensors
 ```bash
 curl http://localhost:8080/api/sensors
+```
+
+### Run Sensor Simulator (Java)
+```bash
+cd simulators/java
+javac SensorSimulator.java
+java SensorSimulator
+```
+
+### Run Sensor Simulator (C)
+```bash
+cd simulators/c
+make
+./sensor_simulator
 ```
 
 ### Error Response Example
@@ -219,6 +265,7 @@ curl http://localhost:8080/api/sensors/999
 ## Features Implemented
 
 ✅ Full CRUD operations  
+✅ Support for partial sensor data (optional fields)  
 ✅ Input validation with detailed error messages  
 ✅ Custom exception handling  
 ✅ Swagger/OpenAPI documentation  
@@ -229,7 +276,8 @@ curl http://localhost:8080/api/sensors/999
 ✅ Proper HTTP status codes  
 ✅ Transaction management  
 ✅ Connection pooling  
-✅ Comprehensive README  
+✅ Sensor simulators (Java and C)  
+✅ Comprehensive README and documentation  
 
 ## Quality Assurance
 
@@ -254,8 +302,20 @@ curl http://localhost:8080/api/sensors/999
 The project is complete and fully functional. All requirements from the problem statement have been met:
 - Spring Boot 4.0.0 ✓
 - IoT sensors REST API (temperature, humidity, pressure) ✓
+- Support for partial sensor data ✓
+- Sensor simulators in Java and C ✓
 - Swagger documentation ✓
 - Two environments (development with H2, production with PostgreSQL) ✓
 - SQL scripts for database creation ✓
+
+### Sensor Simulator Implementation Details
+
+The sensor simulators implement the requested behavior:
+1. **Timing**: Send data every ~30 seconds with ±10 seconds random variation (20-40 seconds range)
+2. **Data Generation**: Generate fictitious values for temperature, humidity, and pressure
+3. **Variable Fields**: Randomly send 1, 2, or 3 of the sensor parameters
+4. **Packet Loss**: Simulate transmission failures (~10% of cycles)
+
+Both Java and C versions provide identical functionality and can be used interchangeably to test the API.
 
 The application is production-ready and follows Spring Boot best practices.
