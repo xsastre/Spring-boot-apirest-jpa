@@ -15,7 +15,7 @@ A functional Spring Boot REST API for managing IoT sensor readings (temperature,
 
 ## Technologies
 
-- **Java 21**
+- **Java 17+**
 - **Spring Boot 4.0.0**
 - **Spring Data JPA**
 - **H2 Database** (development)
@@ -25,7 +25,7 @@ A functional Spring Boot REST API for managing IoT sensor readings (temperature,
 
 ## Prerequisites
 
-- Java 21 or higher
+- Java 17 or higher
 - Maven 3.6+
 - PostgreSQL 12+ (for production environment)
 
