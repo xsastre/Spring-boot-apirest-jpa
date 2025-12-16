@@ -42,13 +42,49 @@ Created comprehensive SQL scripts:
 - `schema-postgresql.sql`: PostgreSQL-specific creation script with indexes
 - `data-dev.sql`: Sample data for development environment
 
+## Database Access Technique
+
+### JPA (Java Persistence API) with Spring Data JPA
+
+This project implements the **JPA standard** for database access, using **Spring Data JPA** to simplify repository implementations.
+
+#### Implementation Details:
+
+1. **JPA Entity Model**
+   - `Sensor` entity class annotated with `@Entity`
+   - Jakarta Persistence API annotations for ORM mapping
+   - Automatic primary key generation using `@GeneratedValue(strategy = GenerationType.IDENTITY)`
+   - Lifecycle callbacks with `@PrePersist` and `@PreUpdate`
+   - Column mappings with proper constraints
+
+2. **Spring Data JPA Repository Pattern**
+   - `SensorRepository` extends `JpaRepository<Sensor, Long>`
+   - No implementation code required - Spring generates at runtime
+   - Built-in CRUD methods: `save()`, `findById()`, `findAll()`, `deleteById()`
+   - Custom derived query methods: `findByLocation()`, `findByName()`
+   - Automatic transaction management
+
+3. **Hibernate as JPA Provider**
+   - Hibernate 6.x (included with Spring Boot 4.0.0)
+   - Automatic DDL generation in development environment
+   - HikariCP for connection pooling
+   - Support for multiple database dialects (H2, PostgreSQL)
+
+4. **Benefits of this approach**
+   - Type-safe database operations
+   - Database vendor independence
+   - Reduced boilerplate code
+   - Automatic entity-to-table mapping
+   - Built-in transaction management
+   - Easy to test with in-memory databases
+
 ## Architecture
 
 ### Layered Architecture
 1. **Controller Layer**: REST endpoints with Swagger annotations
 2. **Service Layer**: Business logic and transaction management
-3. **Repository Layer**: JPA data access
-4. **Model Layer**: JPA entities
+3. **Repository Layer**: JPA data access using Spring Data repositories
+4. **Model Layer**: JPA entities with ORM annotations
 5. **DTO Layer**: Request/Response data transfer objects
 6. **Exception Layer**: Custom exception handling
 
