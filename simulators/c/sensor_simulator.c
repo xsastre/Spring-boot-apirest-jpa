@@ -94,21 +94,28 @@ void generate_sensor_data(SensorData *data) {
     if (field_count == 1) {
         // Send only one field
         int field = rand() % 3;
+        char timestamp[64];
+        char msg[256];
+        get_timestamp(timestamp, sizeof(timestamp));
+        
         switch (field) {
             case 0:
                 data->temperature = generate_temperature();
                 data->has_temperature = 1;
-                printf("[%s] Generated data: Temperature=%.2f°C\n", "", data->temperature);
+                snprintf(msg, sizeof(msg), "Generated data: Temperature=%.2f°C", data->temperature);
+                log_message(msg);
                 break;
             case 1:
                 data->humidity = generate_humidity();
                 data->has_humidity = 1;
-                printf("[%s] Generated data: Humidity=%.2f%%\n", "", data->humidity);
+                snprintf(msg, sizeof(msg), "Generated data: Humidity=%.2f%%", data->humidity);
+                log_message(msg);
                 break;
             case 2:
                 data->pressure = generate_pressure();
                 data->has_pressure = 1;
-                printf("[%s] Generated data: Pressure=%.2f hPa\n", "", data->pressure);
+                snprintf(msg, sizeof(msg), "Generated data: Pressure=%.2f hPa", data->pressure);
+                log_message(msg);
                 break;
         }
     } else if (field_count == 2) {
@@ -163,23 +170,21 @@ void generate_sensor_data(SensorData *data) {
  * Build JSON payload from sensor data
  */
 void build_json(const SensorData *data, char *json, size_t size) {
-    char temp[512];
-    snprintf(json, size, "{\"name\":\"%s\",\"location\":\"%s\"", data->name, data->location);
+    size_t offset = snprintf(json, size, "{\"name\":\"%s\",\"location\":\"%s\"", data->name, data->location);
     
-    if (data->has_temperature) {
-        snprintf(temp, sizeof(temp), ",\"temperature\":%.2f", data->temperature);
-        strncat(json, temp, size - strlen(json) - 1);
+    if (data->has_temperature && offset < size) {
+        offset += snprintf(json + offset, size - offset, ",\"temperature\":%.2f", data->temperature);
     }
-    if (data->has_humidity) {
-        snprintf(temp, sizeof(temp), ",\"humidity\":%.2f", data->humidity);
-        strncat(json, temp, size - strlen(json) - 1);
+    if (data->has_humidity && offset < size) {
+        offset += snprintf(json + offset, size - offset, ",\"humidity\":%.2f", data->humidity);
     }
-    if (data->has_pressure) {
-        snprintf(temp, sizeof(temp), ",\"pressure\":%.2f", data->pressure);
-        strncat(json, temp, size - strlen(json) - 1);
+    if (data->has_pressure && offset < size) {
+        offset += snprintf(json + offset, size - offset, ",\"pressure\":%.2f", data->pressure);
     }
     
-    strncat(json, "}", size - strlen(json) - 1);
+    if (offset < size) {
+        snprintf(json + offset, size - offset, "}");
+    }
 }
 
 /**
