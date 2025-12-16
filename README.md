@@ -23,6 +23,37 @@ A functional Spring Boot REST API for managing IoT sensor readings (temperature,
 - **SpringDoc OpenAPI 3** (Swagger UI)
 - **Maven**
 
+## Database Access Technique / Tècnica d'Accés a Base de Dades
+
+This project uses **JPA (Java Persistence API)** with **Spring Data JPA** as the database access technique.
+
+### Key Components:
+
+1. **JPA Entities**: The `Sensor` class is annotated with `@Entity` and uses JPA annotations for object-relational mapping
+   - `@Entity` and `@Table` for mapping to database tables
+   - `@Id` and `@GeneratedValue` for primary key management
+   - `@Column` for field-to-column mapping
+   - `@PrePersist` and `@PreUpdate` for lifecycle callbacks
+
+2. **Spring Data JPA Repositories**: The `SensorRepository` interface extends `JpaRepository<Sensor, Long>`
+   - Provides automatic CRUD operations without boilerplate code
+   - Custom query methods using method naming conventions (e.g., `findByLocation`, `findByName`)
+   - Automatic implementation at runtime by Spring Data
+
+3. **Hibernate as JPA Provider**: Hibernate is used as the underlying JPA implementation
+   - Automatic schema generation (DDL) in development
+   - Transaction management
+   - Connection pooling via HikariCP
+
+### Advantages of this approach:
+
+- **Object-Oriented**: Work with Java objects instead of SQL statements
+- **Database Independence**: Same code works with H2 (dev) and PostgreSQL (prod)
+- **Reduced Boilerplate**: No need to write DAO implementations
+- **Type Safety**: Compile-time checking of queries
+- **Automatic CRUD**: Standard operations provided out-of-the-box
+- **Custom Queries**: Easy to add custom query methods using method names or JPQL
+
 ## Prerequisites
 
 - Java 17 or higher
