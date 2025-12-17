@@ -1,3 +1,9 @@
+<img src="https://docencia.xaviersastre.cat/Moduls/DWES/img/Spring_Boot_Documentation_Header_1200x200px_with_Xavier_Sastre_Mug_and_Logo_ajustat.png"> 
+
+[![Fet amb Spring Boot](https://img.shields.io/badge/Fet%20amb-Spring%20Boot-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![per en](https://img.shields.io/badge/per%20en-xsastre-red)](https://github.com/xsastre)
+[![Desenvolupat al des-2025](https://img.shields.io/badge/Desenvolupat%20al-des--2025-yellow)](https://github.com/xsastre)
+
 # API REST per Sensors IoT - Spring Boot 4.0.0
 
 [English version below](#iot-sensors-rest-api---spring-boot-400)
